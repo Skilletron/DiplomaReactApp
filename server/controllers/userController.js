@@ -7,14 +7,14 @@ const generateJwt = (id,email,role)=>{
    return jwt.sign(
        {id,email,role},
         process.env.SECRET_KEY,
-        {expressIn:'24h'}
+
     )
 }
 
 class UserController{
-    async registration(req,res,next){
+    async registration(request, response, next){
 
-            const {email, password, role} = req.body
+            const {email, password, role} = request.body
             if (!email || !password) {
                 return next(ApiError.badRequest('Неккоректный email'))
             }
@@ -26,16 +26,16 @@ class UserController{
             const user = await User.create({email, role, password: hashPassword})
             const basket = await Basket.create({userId: user.id})
             const token = generateJwt(user.id, user.email, user.role)
-            return res.json({token})
+            return response.json({token})
 
 
         }
 
 
 
-    async login(req,res,next) {
+    async login(request, response,next) {
 
-            const {email, password} = req.body
+            const {email, password} = request.body
             const user = await User.findOne({where: {email}})
             if (!user) {
                 return next(ApiError.internal('Пользователь с таким именем не найден'))
@@ -45,16 +45,12 @@ class UserController{
                 return next(ApiError.internal('Неверный пароль'))
             }
             const token = generateJwt(user.id, user.email, user.role)
-            return res.json({token})
+            return response.json({token})
 
     }
-    async check(req,res){
-        try{
-      const token = generateJwt(req.user.id,req.user.email,req.user.role)
-        return  res.json({token})
-        }catch (e) {
-            console.log(e)
-        }
+    async check(request, response){
+      const token = generateJwt(request.user.id,request.user.email,request.user.role)
+        return  response.json({token})
     }
 
 }
