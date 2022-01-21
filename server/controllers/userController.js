@@ -26,7 +26,7 @@ class UserController{
             const user = await User.create({email, role, password: hashPassword})
             const basket = await Basket.create({userId: user.id})
             const token = generateJwt(user.id, user.email, user.role)
-            return response.json({token})
+            return response.json({token,basket})
 
 
         }
